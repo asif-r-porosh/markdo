@@ -24,6 +24,10 @@
 /vendor/*
   Cache-Control: no-cache
 
+# The licence file has no extension; show it as text instead of downloading it.
+/LICENSE
+  Content-Type: text/plain; charset=utf-8
+
 # Font files are large and change only with a new font pack name.
 /fonts/*
   Cache-Control: public, max-age=2592000
