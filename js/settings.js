@@ -61,7 +61,7 @@ export function resetControlsToDefaults(persist, docOnly) {
   headFontSel.value = DEFAULT_HEAD_FONT;
   bodyFontSel.value = DEFAULT_BODY_FONT;
   codeFontSel.value = DEFAULT_CODE_FONT;
-  baseSizeSel.value = '11pt';
+  baseSizeSel.value = '12pt';
   lineHeightSel.value = '1.55';
   if (!docOnly) { setThemeChoice('system', persist); }
   setDocStyle(DEFAULT_DOC_STYLE, persist);

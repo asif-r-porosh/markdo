@@ -51,7 +51,7 @@ function applyConfig(cfg) {
   var hf = fontStack(cfg.headFont) || fontStack(DEFAULT_HEAD_FONT);
   var bf = fontStack(cfg.bodyFont) || fontStack(DEFAULT_BODY_FONT);
   var cf = fontStack(cfg.codeFont) || fontStack(DEFAULT_CODE_FONT);
-  var fs = PT_RE.test(cfg.fontSize) ? cfg.fontSize : '11pt';
+  var fs = PT_RE.test(cfg.fontSize) ? cfg.fontSize : '12pt';
   var lh = LH_RE.test(cfg.lineHeight) ? cfg.lineHeight : '1.55';
   rs.setProperty('--head-font', hf);
   rs.setProperty('--doc-font', bf);

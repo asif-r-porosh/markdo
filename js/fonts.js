@@ -67,8 +67,8 @@ export var FONT_GROUPS = [
 var CODE_FONT_OPTIONS = [
   { v: 'sysmono', label: 'System mono', group: 'mono', mono: true, stack: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace' }
 ];
-export var DEFAULT_HEAD_FONT = 'geist';      /* Geist family everywhere: UI, headings, body, code */
-export var DEFAULT_BODY_FONT = 'geistserif';
+export var DEFAULT_HEAD_FONT = 'geistserif'; /* Geist family everywhere: serif headings, sans body, mono code */
+export var DEFAULT_BODY_FONT = 'geist';
 export var DEFAULT_CODE_FONT = 'geistmono';
 
 /* Font keys that no longer exist (removed from the lineup) and the face a

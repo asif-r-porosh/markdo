@@ -63,14 +63,14 @@ test('fonts/ and css/fonts.css agree on the file list, sw.js no longer precaches
   assert.equal(/'\.\/fonts\/[^']+\.woff2'/.test(sw), false, 'fonts belong to the page-filled font cache, not the shell list');
 });
 
-test('defaults are the Geist family: headings Geist, body Geist Serif, code Geist Mono', async function () {
+test('defaults are the Geist family: headings Geist Serif, body Geist, code Geist Mono', async function () {
   const { page } = await H.openApp(env);
   const v = await page.evaluate(function () {
     return [document.querySelector('#headFont').value, document.querySelector('#bodyFont').value, document.querySelector('#codeFont').value,
       getComputedStyle(document.querySelector('.page-content')).fontFamily];
   });
-  assert.deepEqual(v.slice(0, 3), ['geist', 'geistserif', 'geistmono']);
-  assert.match(v[3], /^"?Geist Serif/);
+  assert.deepEqual(v.slice(0, 3), ['geistserif', 'geist', 'geistmono']);
+  assert.match(v[3], /^"?Geist"?,/);
 });
 
 test('Anek Bangla is bundled with its licence; SolaimanLipi is gone everywhere', async function () {
@@ -94,4 +94,42 @@ test('Anek Bangla is bundled with its licence; SolaimanLipi is gone everywhere',
   assert.equal(r.bn, true);
   assert.match(r.reg, /loaded/);
   assert.match(r.bold, /loaded/);
+});
+
+test('defaults: serif headings, sans body, mono code, 12pt, on a fresh start and after File > New', async function () {
+  const { page } = await H.openApp(env);
+  const read = async function () {
+    return page.evaluate(function () {
+      const h = document.querySelector('#preview h1, .page h1');
+      const p = document.querySelector('#preview p, .page p');
+      return {
+        sel: [document.getElementById('headFont').value, document.getElementById('bodyFont').value, document.getElementById('codeFont').value, document.getElementById('baseSize').value],
+        headFam: h ? getComputedStyle(h).fontFamily : '',
+        bodyFam: p ? getComputedStyle(p).fontFamily : '',
+        bodyPx: p ? getComputedStyle(p).fontSize : ''
+      };
+    });
+  };
+  const check = function (r, where) {
+    assert.deepEqual(r.sel, ['geistserif', 'geist', 'geistmono', '12pt'], where + ': dropdowns');
+    assert.match(r.headFam, /^"?Geist Serif"?/, where + ': heading font');
+    assert.match(r.bodyFam, /^"?Geist"?,/, where + ': body font');
+    assert.equal(r.bodyPx, '16px', where + ': 12pt body text');
+  };
+  check(await read(), 'fresh start');
+  /* change everything, make the document dirty, then File > New: back to the defaults */
+  await page.evaluate(function () {
+    [['headFont', 'inter'], ['bodyFont', 'lora'], ['baseSize', '9pt']].forEach(function (kv) {
+      const el = document.getElementById(kv[0]);
+      el.value = kv[1];
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  });
+  assert.deepEqual((await read()).sel, ['inter', 'lora', 'geistmono', '9pt'], 'the changes took effect before File > New');
+  await H.setDoc(page, '# Title\n\nSome body text.\n');
+  await page.click('#mbFileBtn');
+  await page.locator('#mbFileMenu').getByText('New', { exact: true }).click();
+  await page.click('#closeDiscard');
+  await H.setDoc(page, '# Title\n\nSome body text.\n');
+  check(await read(), 'after File > New');
 });
