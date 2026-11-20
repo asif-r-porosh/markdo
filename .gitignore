@@ -1,0 +1,19 @@
+UI_PLAN.md
+PROJECT_BRIEF.md
+FEATURES.md
+## Node.js dependencies
+node_modules/
+
+# macOS resource forks & AppleDouble files
+._*
+.AppleDouble
+
+# Common macOS Finder & system metadata
+.DS_Store
+.LSOverride
+Icon?
+__MACOSX/
+
+# staged hosting output (scripts/stage.sh)
+dist/
+.wrangler/

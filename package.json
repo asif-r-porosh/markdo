@@ -1,0 +1,13 @@
+{
+  "name": "markdo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Test harness for the MarkDo Markdown editor",
+  "scripts": {
+    "test": "node --test --test-timeout=120000 tests/*.test.js"
+  },
+  "devDependencies": {
+    "jszip": "^3.10.2",
+    "playwright-core": "^1.65.1"
+  }
+}

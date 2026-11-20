@@ -1,0 +1,29 @@
+# Cloudflare Pages response headers (copied into dist/ by scripts/stage.sh).
+# Rules that match one path are merged, so no two rules set the same header.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# The shell is revalidated on every load; sw.js above all, so a release is
+# noticed at once. The service worker installs each file with cache:'reload'.
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/sw.js
+  Cache-Control: no-cache
+/manifest.json
+  Cache-Control: no-cache
+/css/*
+  Cache-Control: no-cache
+/js/*
+  Cache-Control: no-cache
+/vendor/*
+  Cache-Control: no-cache
+
+# Font files are large and change only with a new font pack name.
+/fonts/*
+  Cache-Control: public, max-age=2592000

@@ -1,0 +1,596 @@
+  :root{
+    /* document geometry (toolbar-driven) */
+    --pw: 210mm;          /* page width  */
+    --ph: 297mm;          /* page height */
+    --pm: 20mm;           /* page margin (content padding inside the page) */
+    --gap: 13px;          /* vertical gap between content blocks */
+    --ui-font: "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;  /* UI chrome base: Geist Sans 15px/500 (bundled) */
+    --mono-font: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --editor-font: "Geist Mono", var(--mono-font);   /* editor pane: bundled Geist Mono */
+    --doc-code-font: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;  /* document code font (toolbar: Code font) */
+    --doc-font: "Geist Serif", "Source Serif 4", Georgia, "Times New Roman", serif;   /* body font (toolbar: Body font); ships in fonts/ */
+    --head-font: "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;  /* heading font (toolbar: Header font) */
+    --doc-size: 11pt;      /* base font size (toolbar: Base size) */
+    --doc-lh: 1.55;        /* base line height (toolbar: Line height) */
+
+    /* document style (toolbar: Doc style) — flows into the preview and
+       the exported PDF; presets override these under html[data-docstyle] */
+    --paper: #FFFFFF;
+    --doc-text: #111827;
+    --doc-heading: #0f172a;
+    --doc-link: #4F46E5;
+    --doc-muted: #6b7280;
+    --doc-quote-border: #cbd5e1;
+    --doc-quote-text: #374151;
+    --doc-code-bg: #f1f5f9;
+    --doc-code-border: #e2e8f0;
+    --doc-pre-bg: #f8fafc;
+    --doc-pre-border: #e2e8f0;
+    --doc-table-border: #cbd5e1;
+    --doc-table-head-bg: #f1f5f9;
+    --doc-hr: #cbd5e1;
+
+    /* geometry */
+    --r-sm: 4px; --r-md: 6px; --r-lg: 8px;
+    --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px;
+    --fs-xs: 11px; --fs-sm: 12.5px; --fs-md: 13.5px; --fs-lg: 15px;
+
+    /* motion */
+    --t-fast: 120ms; --t-med: 200ms; --ease: cubic-bezier(.4,0,.2,1);
+
+    /* theme: light (default) */
+    color-scheme: light;
+    --bg-app: #F7F7F5;
+    --bg-surface: #FFFFFF;
+    --bg-subtle: #F1F1EF;
+    --bg-inset: #EFEEEC;
+    --text-1: #37352F;
+    --text-2: #66655F;   /* AA-adjusted from #73726E (audit: 4.82 -> 5.85 on surface) */
+    --text-3: #6F6E69;   /* AA-adjusted from #9B9A97 (audit: 2.81 -> 5.11 on surface) */
+    --text-faint: #C3C2BF;
+    --border: #E9E8E6;
+    --border-strong: #DFDEDA;
+    --accent: #4F46E5;
+    --accent-hover: #4338CA;
+    --accent-soft: #EEF0FB;
+    --accent-ring: rgba(79,70,229,.35);
+    --accent-contrast: #FFFFFF;
+    --selection: rgba(79,70,229,.18);
+    --hl-head: #1D4ED8; --hl-code: #9A3412; --hl-link: #0E7490; --hl-mk: #6F6E69; --hl-pb: #7E22CE; --hl-cm: #8A8984;
+    --overlay: rgba(15,15,15,.38);
+    --danger: #B42318;
+    --danger-soft: rgba(180,35,24,.5);
+    --danger-ink: rgba(180,35,24,.08);
+    --shadow-page: 0 1px 2px rgba(15,15,15,.07), 0 4px 16px rgba(15,15,15,.08);
+    --paper: #FFFFFF;
+  }
+  html[data-theme="dark"]{
+    color-scheme: dark;
+    --bg-app: #191919;
+    --bg-surface: #202020;
+    --bg-subtle: #2A2A2A;
+    --bg-inset: #262626;
+    --text-1: #E8E7E3;
+    --text-2: #9E9C96;
+    --text-3: #ABA9A3;   /* AA-adjusted from #6F6E69 (audit: 3.19 -> 6.93 on surface) */
+    --text-faint: #4A4946;
+    --border: #2E2E2C;
+    --border-strong: #3C3B39;
+    --accent: #818CF8;
+    --accent-hover: #93A0FD;
+    --accent-soft: rgba(129,140,248,.16);
+    --accent-ring: rgba(129,140,248,.45);
+    --accent-contrast: #1E1B4B;
+    --selection: rgba(129,140,248,.32);
+    --hl-head: #8AB4FF; --hl-code: #F0A070; --hl-link: #5FC9D8; --hl-mk: #8F8E89; --hl-pb: #C9A5FF; --hl-cm: #7A7974;
+    --overlay: rgba(0,0,0,.55);
+    --danger: #F87171;
+    --danger-soft: rgba(248,113,113,.45);
+    --danger-ink: rgba(248,113,113,.14);
+    --shadow-page: 0 1px 2px rgba(0,0,0,.55), 0 4px 16px rgba(0,0,0,.45);
+  }
+  *{ box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body{ height: 100%; margin: 0; }
+  body{ font-family: var(--ui-font); font-size: 15px; font-weight: 500; color: var(--text-1); background: var(--bg-app); overflow: hidden; }
+
+  #app{ display: flex; flex-direction: column; height: 100vh; }
+
+  /* ------------------------------------------------------- toolbar ---- */
+  /* Two fixed rows, no horizontal scrolling: an overflow container would
+     clip the dropdown menus at the bar's edge, so overflow stays visible. */
+  #toolbar{
+    display: flex; flex-direction: column; align-items: stretch; gap: 2px; padding: 8px 14px;
+    background: var(--bg-surface); border-bottom: 1px solid var(--border); flex: 0 0 auto;
+  }
+  .trow{ display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  #toolbar .brand{ font-weight: 600; font-size: var(--fs-lg); letter-spacing: .2px; margin-right: 6px; white-space: nowrap; }
+  #toolbar .brand em{ color: var(--accent); font-style: normal; }
+  .spacer{ flex: 1 1 auto; }
+  /* segmented group on the toolbar's right side: [Line ↵][Page ↵][Save ✓] */
+  .tb-group{
+    display: inline-flex; align-items: stretch; flex: 0 0 auto;
+    border: 1px solid var(--border-strong); border-radius: var(--r-md);
+    overflow: hidden; background: var(--bg-surface);
+  }
+  .tb-group .tbtn{ border-radius: 0; border: 0; padding: 5px 12px; }
+  .tb-group .tbtn + .tbtn{ box-shadow: inset 1px 0 0 var(--border); }
+  #docxBtn[disabled]{ opacity: .55; pointer-events: none; }
+  .tsep{ flex: 0 0 1px; align-self: stretch; margin: 2px 0; background: var(--border); }
+  .tbtn{
+    font: inherit; font-weight: 500; color: var(--text-1); background: transparent; border: 1px solid transparent;
+    border-radius: var(--r-md); padding: 5px 12px; cursor: pointer; white-space: nowrap;
+    transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  }
+  .tbtn:hover{ background: var(--bg-subtle); }
+  .tbtn:active{ transform: translateY(1px); }
+  #themeBtn{ display: inline-flex; align-items: center; justify-content: center; padding: 5px 8px; color: var(--text-2); }
+  #themeBtn:hover{ color: var(--text-1); }
+  #themeBtn svg{ width: 16px; height: 16px; display: block; }
+  #themeBtn .icon-sun{ display: none; }
+  html[data-theme="dark"] #themeBtn .icon-moon{ display: none; }
+  html[data-theme="dark"] #themeBtn .icon-sun{ display: block; }
+  #syncBtn{ display: inline-flex; align-items: center; justify-content: center; padding: 5px 8px; color: var(--text-3); }
+  #syncBtn:hover{ color: var(--text-1); }
+  #syncBtn svg{ width: 16px; height: 16px; display: block; }
+  #syncBtn[aria-pressed="true"]{ color: var(--accent); background: var(--accent-soft); }
+  #syncBtn[aria-pressed="true"]:hover{ color: var(--accent); }
+  /* split direction toggle (statusbar): columns icon = side-by-side,
+     rows icon = stacked; the icon reflects the CURRENT direction */
+  #splitBtn{ display: inline-flex; align-items: center; justify-content: center; padding: 3px 8px; color: var(--text-3); }
+  #splitBtn:hover{ color: var(--text-1); }
+  #splitBtn svg{ width: 15px; height: 15px; display: block; }
+  #splitBtn .icon-rows{ display: none; }
+  body[data-split="h"] #splitBtn .icon-cols{ display: none; }
+  body[data-split="h"] #splitBtn .icon-rows{ display: block; }
+  /* free-text footer input (row 2) */
+  .txtin{
+    font: inherit; font-size: var(--fs-xs); color: var(--text-1); background: var(--bg-inset);
+    border: 1px solid var(--border-strong); border-radius: var(--r-md); padding: 4px 8px;
+    width: 180px; outline: none; min-width: 0;
+    transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+  }
+  .txtin::placeholder{ color: var(--text-3); }
+  /* checkbox: same accent and check mark as the menus, one look on every browser */
+  .hf-cb{ display: inline-flex; align-items: center; gap: 8px; cursor: pointer; line-height: 1; }
+  .hf-row input[type="checkbox"]{
+    -webkit-appearance: none; appearance: none; position: relative;
+    width: 16px; height: 16px; margin: 0; flex: 0 0 auto; cursor: pointer;
+    border: 1.5px solid var(--border-strong); border-radius: 4px; background: var(--bg-inset);
+    transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+  }
+  .hf-row input[type="checkbox"]:hover:not(:disabled){ border-color: var(--accent); }
+  .hf-row input[type="checkbox"]:checked{ background: var(--accent); border-color: var(--accent); }
+  .hf-row input[type="checkbox"]:checked::after{
+    content: ""; position: absolute; left: 4.5px; top: 1px; width: 4px; height: 8px;
+    border: solid var(--accent-contrast); border-width: 0 2px 2px 0; transform: rotate(45deg);
+  }
+  .hf-row input[type="checkbox"]:disabled{ opacity: .4; cursor: not-allowed; }
+  .hf-row .hf-cb:has(input:disabled){ cursor: not-allowed; color: var(--text-3); }
+  .numin{
+    font: inherit; color: var(--text-1); background: var(--bg-inset); border: 1px solid var(--border-strong);
+    border-radius: var(--r-md); padding: 3px 4px; width: 46px; outline: none; text-align: center;
+    appearance: textfield; -moz-appearance: textfield;
+    transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  }
+  .numin::-webkit-outer-spin-button, .numin::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
+  .numin:disabled{ opacity: .45; cursor: not-allowed; }
+
+  /* --------------------------------------- toolbar menubar ------------- */
+  /* Row 1 hosts three cascading menus (File, Format, Layout) plus Save;
+     row 2 holds the page furniture. Rows wrap on very narrow windows. */
+  .menubar{ display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+  .dd-btn.menubtn{
+    background: transparent; border-color: transparent; font-weight: 500; padding: 5px 10px;
+  }
+  .dd-btn.menubtn:hover{ background: var(--bg-subtle); }
+  /* panels: no scroll of their own (<= 7 rows); submenus may overflow them */
+  .dd-menu.mpanel{ min-width: 240px; max-height: none; overflow: visible; padding: 6px; }
+  .dd-menu.sub{ min-width: 210px; max-height: 62vh; overflow-y: auto; z-index: 61; left: calc(100% - 8px); }
+  .dd-sep{ height: 1px; background: var(--border); margin: 5px 8px; }
+  /* picker row inside Format / Layout: label + current value + cascade arrow */
+  .dd-opt.mrow{ justify-content: flex-start; }
+  .mrow .mrow-lab{ flex: 0 0 auto; }
+  .mrow .mrow-val{
+    margin-left: auto; color: var(--text-3); font-size: var(--fs-xs);
+    max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .mrow .chev-r{ width: 11px; height: 11px; flex: 0 0 auto; color: var(--text-3); }
+  .dd-opt .dd-hint{
+    margin-left: auto; color: var(--text-3); font-size: var(--fs-xs); white-space: nowrap;
+  }
+  /* Bootstrap-style dropdown menus. The real <select> stays in the DOM as
+     the invisible state holder (.dd-src) so settings, shortcuts and tests
+     keep working; the button + menu are the visible surface. */
+  .dd{ position: relative; display: inline-flex; }
+  select.dd-src{
+    position: absolute; width: 1px; height: 1px; opacity: 0; margin: -1px; pointer-events: none;
+  }
+  .dd-btn{
+    font: inherit; font-size: var(--fs-sm); color: var(--text-1); white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--bg-inset); border: 1px solid var(--border-strong);
+    border-radius: var(--r-md); padding: 4px 9px; cursor: pointer;
+    transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  }
+  .dd-btn:hover{ background: var(--bg-subtle); }
+  .dd-btn .dd-val{ max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
+  .dd-btn .chev{ width: 10px; height: 6px; flex: 0 0 auto; color: var(--accent-hover); transition: transform var(--t-fast) var(--ease); }
+  .dd.open .dd-btn{ background: var(--bg-subtle); border-color: var(--accent); }
+  .dd.open .chev{ transform: rotate(180deg); }
+  .dd-menu{
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 60;
+    min-width: 210px; max-height: 62vh; overflow-y: auto; overscroll-behavior: contain;
+    background: var(--bg-surface); border: 1px solid var(--border-strong);
+    border-radius: var(--r-md); box-shadow: var(--shadow-page); padding: 4px;
+  }
+  .dd-menu[hidden]{ display: none; }
+  .dd-group{
+    font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .9px;
+    color: var(--text-3); padding: 7px 9px 3px; user-select: none; white-space: nowrap;
+  }
+  .dd-opt{
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    font: inherit; font-size: var(--fs-sm); color: var(--text-1); text-align: left;
+    background: transparent; border: 0; border-radius: 6px; padding: 5px 9px; cursor: pointer;
+  }
+  .dd-opt:hover, .dd-opt.focus{ background: var(--bg-subtle); }
+  .dd-opt[aria-selected="true"]{ color: var(--accent); font-weight: 600; }
+  .dd-opt .dd-check{ width: 13px; height: 13px; flex: 0 0 auto; visibility: hidden; color: var(--accent); }
+  .dd-opt[aria-selected="true"] .dd-check{ visibility: visible; }
+  .dd-opt .dd-face{ flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dd-opt .dd-sw{                                     /* doc-style color swatch */
+    width: 14px; height: 14px; border-radius: 50%; flex: 0 0 auto;
+    border: 1px solid var(--border-strong); display: inline-block;
+    font-size: 8px; text-align: center; line-height: 12px; overflow: hidden;
+  }
+
+  /* close-document dialog */
+  .modal{ position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center;
+          background: var(--overlay); }
+  .modal[hidden]{ display: none; }
+  .modal-card{
+    width: min(430px, calc(100vw - 32px)); background: var(--bg-surface);
+    border: 1px solid var(--border-strong); border-radius: 10px; box-shadow: var(--shadow-page);
+    padding: 18px 20px;
+  }
+  .modal-card h2{ margin: 0 0 8px; font-size: var(--fs-lg); color: var(--text-1); }
+  .modal-card p{ margin: 0 0 16px; font-size: var(--fs-sm); color: var(--text-2); line-height: 1.5; }
+  .modal-actions{ display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+  /* running header/footer editor (Page Setup > Header/Footer) */
+  .modal-card.hf{ width: min(780px, calc(100vw - 32px)); }
+  .modal-card.hf #hfNote{ margin: 0 0 10px; }
+  #hfRows{ display: flex; flex-direction: column; margin: 0 0 14px; }
+  .hf-row{
+    display: grid; grid-template-columns: 150px minmax(0, 1fr) 176px; gap: 12px;
+    align-items: center; min-height: 46px; padding: 6px 0; border-top: 1px solid var(--border);
+  }
+  #hfRows .hf-row:first-child{ border-top: 0; }
+  .hf-lab{ display: flex; align-items: center; gap: 18px; font-size: var(--fs-sm); color: var(--text-1); white-space: nowrap; }
+  .hf-fields{ display: flex; align-items: center; gap: 8px; font-size: var(--fs-sm); color: var(--text-2); flex-wrap: wrap; }
+  .hf-pos{ display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 6px; }
+  .hf-fields .txtin{ width: 100%; max-width: 320px; }
+  .hf-fields .txtin, .hf-fields .numin, .hf-pos select{ height: 28px; box-sizing: border-box; }
+  .hf-pos .hf-side{ width: 84px; }
+  .hf-pos .hf-al{ width: 76px; }
+  .hf-pos select{
+    font: inherit; font-size: var(--fs-sm); color: var(--text-1); background: var(--bg-inset);
+    border: 1px solid var(--border-strong); border-radius: var(--r-md); padding: 4px 8px; outline: none;
+  }
+  .hf-row[data-off="1"] .hf-fields, .hf-row[data-off="1"] .hf-pos{ opacity: .45; }
+  .hf-row .hf-noSlot{ font-size: var(--fs-xs); color: var(--warn, #B45309); display: none; }
+  .hf-row[data-full="1"] .hf-noSlot{ display: block; flex-basis: 100%; text-align: right; }
+  .mbtn{
+    font: inherit; font-weight: 500; border-radius: var(--r-md); padding: 6px 14px; cursor: pointer;
+    border: 1px solid var(--border-strong); background: var(--bg-inset); color: var(--text-1); white-space: nowrap;
+    transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+  }
+  .mbtn:hover{ background: var(--bg-subtle); }
+  .mbtn.primary{ background: var(--accent); border-color: var(--accent); color: var(--accent-contrast); font-weight: 600; }
+  .mbtn.primary:hover{ background: var(--accent-hover); }
+  .mbtn.danger{ color: var(--danger); border-color: var(--danger-soft); }
+  .mbtn.danger:hover{ background: var(--danger-ink); }
+
+  /* keyboard focus: one consistent ring on every control */
+  .tbtn:focus-visible, .hf-pos select:focus-visible, .numin:focus-visible, .txtin:focus-visible,
+  #themeBtn:focus-visible, #syncBtn:focus-visible,
+  #splitBtn:focus-visible, .dd-btn:focus-visible, .mbtn:focus-visible,
+  .hf-row input[type="checkbox"]:focus-visible{
+    outline: 2px solid var(--accent-ring); outline-offset: 2px;
+  }
+
+  /* quiet, theme-aware scrollbars on the two scroll surfaces */
+  #viewport, #editor{ scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+  #viewport::-webkit-scrollbar, #editor::-webkit-scrollbar{ width: 10px; height: 10px; }
+  #viewport::-webkit-scrollbar-track, #editor::-webkit-scrollbar-track{ background: transparent; }
+  #viewport::-webkit-scrollbar-thumb, #editor::-webkit-scrollbar-thumb{
+    background: var(--border-strong); border-radius: 5px; border: 2px solid transparent; background-clip: padding-box;
+  }
+  #viewport::-webkit-scrollbar-thumb:hover, #editor::-webkit-scrollbar-thumb:hover{ background-color: var(--text-3); }
+  #viewport::-webkit-scrollbar-corner{ background: transparent; }
+
+  /* ---------------------------------------------------------- panes ---- */
+  #main{ display: flex; flex: 1 1 auto; min-height: 0; }
+  #editorPane{ flex: 0 1 50%; min-width: 0; min-height: 0; display: flex; background: var(--bg-surface); position: relative; }
+  #previewPane{ flex: 0 1 50%; min-width: 0; min-height: 0; display: flex; }
+  #splitter{
+    flex: 0 0 7px; cursor: col-resize; background: transparent;
+    border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+    transition: background var(--t-fast) var(--ease); position: relative; z-index: 5;
+  }
+  #splitter:hover, body.dragging #splitter{ background: var(--accent-soft); }
+  /* grip affordance, pure CSS: dotted spine appears on hover/drag */
+  #splitter::after{
+    content: ""; position: absolute; top: 50%; left: 50%; width: 2px; height: 28px;
+    transform: translate(-50%, -50%); border-radius: 1px;
+    background: repeating-linear-gradient(to bottom, var(--border-strong) 0 3px, transparent 3px 7px);
+    opacity: 0; transition: opacity var(--t-fast) var(--ease);
+  }
+  #splitter:hover::after, body.dragging #splitter::after{ opacity: 1; }
+  body.dragging{ cursor: col-resize; user-select: none; }
+  body.dragging iframe, body.dragging textarea{ pointer-events: none; }
+
+  /* split direction: v = side-by-side (default), h = preview above editor.
+     column-reverse keeps the DOM (editor, splitter, preview) stable; the
+     drag code detects the reverse direction and flips its math. */
+  body[data-split="h"] #main{ flex-direction: column-reverse; }
+  body[data-split="h"] #splitter{ cursor: row-resize; border-left: 0; border-right: 0;
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  body[data-split="h"] #splitter::after{
+    width: 28px; height: 2px;
+    background: repeating-linear-gradient(to right, var(--border-strong) 0 3px, transparent 3px 7px);
+  }
+  body[data-split="h"].dragging{ cursor: row-resize; }
+
+  #editor, #editorHl{
+    padding: 16px 18px; font-family: var(--editor-font); font-size: 13.5px; line-height: 1.6;
+    tab-size: 2; letter-spacing: normal; font-weight: 400; font-style: normal;
+  }
+  #editor{
+    flex: 1 1 auto; width: 100%; border: 0; outline: none; resize: none;
+    color: var(--text-1); background: var(--bg-surface); caret-color: var(--accent);
+  }
+  #editor::selection{ background: var(--selection); }
+  /* markdown colouring: a coloured copy behind a transparent textarea (js/highlight.js) */
+  #editorHl{
+    display: none; position: absolute; top: 0; left: 0; bottom: 0; right: 0; margin: 0;
+    box-sizing: border-box; overflow: hidden; pointer-events: none;
+    white-space: pre-wrap; overflow-wrap: break-word; word-break: normal; color: var(--text-1);
+  }
+  #editorPane.hl #editorHl{ display: block; }
+  #editorPane.hl #editor{ position: relative; z-index: 1; color: transparent; background: transparent; }
+  #editorPane.hl #editor::selection{ color: transparent; }
+  .hl-head{ color: var(--hl-head); }
+  .hl-code{ color: var(--hl-code); }
+  .hl-link{ color: var(--hl-link); }
+  .hl-mk{ color: var(--hl-mk); }
+  .hl-pb{ color: var(--hl-pb); }
+  .hl-cm{ color: var(--hl-cm); }
+  #editor::placeholder{ color: var(--text-3); }
+
+  /* -------------------------------------------------------- preview ---- */
+  #viewport{
+    flex: 1 1 auto; overflow: auto; padding: 18px;
+    background: var(--bg-app);
+  }
+  #sizer{ position: relative; margin: 0 auto; }
+  #scaler{ position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+  #pages{ display: flex; flex-direction: column; align-items: center; gap: 16px; }
+
+  .page{
+    width: var(--pw); height: var(--ph); padding: var(--pm);
+    background: var(--paper); border-radius: 2px; overflow: hidden; position: relative;
+    box-shadow: var(--shadow-page);
+  }
+  .page-content{
+    height: 100%; overflow: hidden;
+    /* Outside list markers (digit + ". " suffix) can be wider than the
+       list's 1.5em padding-left, so they poke a little past the content
+       box. With the clip edge sitting on that box, wide monospace digits
+       got sliced in half. Shift the clip boundary 1.5em into the page's
+       own margin: markers render into the margin like hanging punctuation.
+       The negative margin cancels the padding for every block, so the
+       visible geometry is pixel-identical. */
+    margin-left: -1.5em; padding-left: 1.5em;
+    font-family: var(--doc-font);
+    font-size: var(--doc-size); line-height: var(--doc-lh); color: var(--doc-text);
+    font-weight: 400;      /* the UI's 500 base stops at the app chrome */
+    word-wrap: break-word; overflow-wrap: break-word;
+  }
+  .blk{ display: flow-root; padding-bottom: var(--gap); }
+  .page-content > .blk > *{ margin: 0; }
+  .mdpb{ display: none; }
+  /* <!--linebreak--> spacer: exactly one body-text line box tall */
+  .mdlb{ height: calc(var(--doc-lh, 1.55) * 1em); }
+  /* running header/footer: one corner slot each (Header/Footer x Left/Right),
+     laid out by Page Setup > Header/Footer; same folio styling the old
+     page number and custom footer used */
+  .rhf{
+    position: absolute; font-family: var(--doc-font); font-size: 9pt; line-height: 1;
+    color: var(--doc-muted); letter-spacing: .03em; font-weight: 400;
+    max-width: calc(100% - var(--pm) * 2);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .rhf-hl{ top: calc(var(--pm) * 0.32); left: var(--pm); }
+  .rhf-hr{ top: calc(var(--pm) * 0.32); right: var(--pm); }
+  .rhf-fl{ bottom: calc(var(--pm) * 0.32); left: var(--pm); }
+  .rhf-fr{ bottom: calc(var(--pm) * 0.32); right: var(--pm); }
+
+  /* --------------------------------- document style presets ----
+     A preset only swaps --paper and the --doc-* tokens, so the on-screen
+     preview and the exported PDF stay pixel-identical. Light presets that
+     keep the white paper inherit --paper from :root; dark presets set it. */
+  html[data-docstyle="github"]{
+    --doc-text:#1F2328; --doc-heading:#1F2328; --doc-link:#0969DA; --doc-muted:#59636E;
+    --doc-quote-border:#D1D9DE; --doc-quote-text:#59636E;
+    --doc-code-bg:#F6F8FA; --doc-code-border:#D1D9DE;
+    --doc-pre-bg:#F6F8FA; --doc-pre-border:#D1D9DE;
+    --doc-table-border:#D1D9DE; --doc-table-head-bg:#F6F8FA; --doc-hr:#D1D9DE;
+  }
+  html[data-docstyle="github-dark"]{
+    --paper:#0D1117; --doc-text:#E6EDF3; --doc-heading:#F0F6FC; --doc-link:#4493F8; --doc-muted:#9198A1;
+    --doc-quote-border:#3D444D; --doc-quote-text:#9198A1;
+    --doc-code-bg:#151B23; --doc-code-border:#3D444D;
+    --doc-pre-bg:#151B23; --doc-pre-border:#3D444D;
+    --doc-table-border:#3D444D; --doc-table-head-bg:#151B23; --doc-hr:#3D444D;
+  }
+  html[data-docstyle="solarized"]{
+    --paper:#FDF6E3; --doc-text:#657B83; --doc-heading:#073642; --doc-link:#268BD2; --doc-muted:#93A1A1;
+    --doc-quote-border:#93A1A1; --doc-quote-text:#586E75;
+    --doc-code-bg:#EEE8D5; --doc-code-border:rgba(7,54,66,.14);
+    --doc-pre-bg:#EEE8D5; --doc-pre-border:rgba(7,54,66,.14);
+    --doc-table-border:rgba(7,54,66,.28); --doc-table-head-bg:#EEE8D5; --doc-hr:#93A1A1;
+  }
+  html[data-docstyle="sepia"]{
+    --paper:#F8F1E3; --doc-text:#4A3F35; --doc-heading:#3B3228; --doc-link:#A05A2C; --doc-muted:#8A7E70;
+    --doc-quote-border:#D9CBB3; --doc-quote-text:#6B5D4F;
+    --doc-code-bg:#F1E7D2; --doc-code-border:#E0D3B8;
+    --doc-pre-bg:#F1E7D2; --doc-pre-border:#E0D3B8;
+    --doc-table-border:#D9CBB3; --doc-table-head-bg:#F1E7D2; --doc-hr:#D9CBB3;
+  }
+  html[data-docstyle="academic"]{
+    --doc-text:#000000; --doc-heading:#000000; --doc-link:#000000; --doc-muted:#444444;
+    --doc-quote-border:#999999; --doc-quote-text:#222222;
+    --doc-code-bg:#FFFFFF; --doc-code-border:#BBBBBB;
+    --doc-pre-bg:#FFFFFF; --doc-pre-border:#BBBBBB;
+    --doc-table-border:#999999; --doc-table-head-bg:#FFFFFF; --doc-hr:#999999;
+  }
+  html[data-docstyle="atom-dark"]{
+    --paper:#282C34; --doc-text:#ABB2BF; --doc-heading:#DCDFE4; --doc-link:#61AFEF; --doc-muted:#5C6370;
+    --doc-quote-border:#3E4451; --doc-quote-text:#9DA5B4;
+    --doc-code-bg:#21252B; --doc-code-border:#3E4451;
+    --doc-pre-bg:#21252B; --doc-pre-border:#3E4451;
+    --doc-table-border:#3E4451; --doc-table-head-bg:#21252B; --doc-hr:#3E4451;
+  }
+  html[data-docstyle="nord"]{
+    --paper:#2E3440; --doc-text:#D8DEE9; --doc-heading:#ECEFF4; --doc-link:#88C0D0; --doc-muted:#8A93A5;
+    --doc-quote-border:#4C566A; --doc-quote-text:#B5BFCE;
+    --doc-code-bg:#3B4252; --doc-code-border:#4C566A;
+    --doc-pre-bg:#3B4252; --doc-pre-border:#4C566A;
+    --doc-table-border:#4C566A; --doc-table-head-bg:#3B4252; --doc-hr:#4C566A;
+  }
+  html[data-docstyle="dracula"]{
+    --paper:#282A36; --doc-text:#F8F8F2; --doc-heading:#F8F8F2; --doc-link:#BD93F9; --doc-muted:#6272A4;
+    --doc-quote-border:#6272A4; --doc-quote-text:#6272A4;
+    --doc-code-bg:#21222C; --doc-code-border:#44475A;
+    --doc-pre-bg:#21222C; --doc-pre-border:#44475A;
+    --doc-table-border:#44475A; --doc-table-head-bg:#21222C; --doc-hr:#44475A;
+  }
+  html[data-docstyle="gruvbox-dark"]{
+    --paper:#282828; --doc-text:#EBDBB2; --doc-heading:#FBF1C7; --doc-link:#83A598; --doc-muted:#928374;
+    --doc-quote-border:#504945; --doc-quote-text:#BDAE93;
+    --doc-code-bg:#3C3836; --doc-code-border:#504945;
+    --doc-pre-bg:#3C3836; --doc-pre-border:#504945;
+    --doc-table-border:#504945; --doc-table-head-bg:#3C3836; --doc-hr:#504945;
+  }
+
+  /* markdown styles (shared by preview and PDF) */
+  /* headings: no horizontal rule/border under h1-h6 */
+  .page-content h1,.page-content h2,.page-content h3,
+  .page-content h4,.page-content h5,.page-content h6{
+    font-family: var(--head-font); font-weight: 700; color: var(--doc-heading); line-height: 1.25;
+  }
+  .page-content h1{ font-size: 1.85em; }
+  .page-content h2{ font-size: 1.45em; }
+  .page-content h3{ font-size: 1.22em; }
+  .page-content h4{ font-size: 1.08em; }
+  .page-content h5,.page-content h6{ font-size: 1em; }
+  .page-content p{ orphans: 2; widows: 2; }
+  .page-content a{ color: var(--doc-link); }
+  .page-content ul,.page-content ol{ padding-left: 1.5em; }
+  .page-content li{ margin: .18em 0; }
+  .page-content li > p{ margin: .25em 0; }
+  .page-content blockquote{
+    margin: 0; padding: .1em 0 .1em 1em; border-left: 3px solid var(--doc-quote-border); color: var(--doc-quote-text);
+  }
+  .page-content blockquote > .blk > *{ margin: 0; }
+  .page-content code{
+    font-family: var(--doc-code-font); font-size: .86em; background: var(--doc-code-bg);
+    border: 1px solid var(--doc-code-border); border-radius: 3px; padding: 0 4px;
+  }
+  .page-content pre{
+    background: var(--doc-pre-bg); border: 1px solid var(--doc-pre-border); border-radius: 6px;
+    padding: 10px 12px; overflow: hidden;
+  }
+  .page-content pre code{
+    display: block; background: none; border: 0; padding: 0; font-size: .82em; line-height: 1.5;
+  }
+  .page-content pre code .cl{ display: block; white-space: pre-wrap; word-break: break-word; }
+  .page-content table{ border-collapse: collapse; width: auto; max-width: 100%; }
+  .page-content th,.page-content td{
+    border: 1px solid var(--doc-table-border); padding: 4px 9px; text-align: left; vertical-align: top;
+  }
+  .page-content th{ background: var(--doc-table-head-bg); font-weight: 600; }
+  .page-content img{ max-width: 100%; height: auto; }
+  .page-content hr{ border: 0; border-top: 1px solid var(--doc-hr); margin: 0; }
+  .page-content kbd{ font-family: var(--doc-code-font); font-size: .82em; border: 1px solid var(--doc-table-border); border-bottom-width: 2px; border-radius: 3px; padding: 0 4px; }
+
+  /* ------------------------------------------------------ statusbar ---- */
+  #statusbar{
+    flex: 0 0 auto; display: flex; align-items: center; gap: 12px;
+    padding: 4px 10px 4px 14px; font-size: var(--fs-sm); color: var(--text-3);
+    background: var(--bg-app); border-top: 1px solid var(--border);
+  }
+  .font-chip{
+    display: inline-flex; align-items: center; gap: 8px; padding: 1px 9px;
+    border: 1px solid var(--border); border-radius: 999px; color: var(--text-2);
+    font-size: var(--fs-xs); white-space: nowrap;
+  }
+  .font-chip[hidden]{ display: none; }
+  .font-chip .bar{ width: 44px; height: 4px; border-radius: 2px; background: var(--border); overflow: hidden; }
+  .font-chip .bar i{ display: block; height: 100%; width: calc(var(--p, 0) * 100%); background: var(--accent); transition: width .15s linear; }
+  @media print{ .font-chip{ display: none !important; } }
+  #statLeft.unsaved{ color: var(--warn, #B45309); font-weight: 600; }
+  .stat-actions{ margin-left: auto; display: flex; align-items: center; gap: 4px; flex: 0 0 auto; }
+  #statusbar .tbtn{ padding: 3px 8px; }
+  /* the View (zoom) menu lives in the bottom bar, so it opens upward */
+  #statusbar .dd-menu{ top: auto; bottom: calc(100% + 8px); left: auto; right: 0; }
+  #statusbar .dd .chev{ transform: rotate(180deg); }
+  #statusbar .dd.open .chev{ transform: rotate(0deg); }
+
+  /* narrow screens: stack panes, splitter becomes horizontal */
+  @media (max-width: 760px){
+    #main{ flex-direction: column; }
+    #splitter{ cursor: row-resize; border: 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    #splitter::after{ width: 28px; height: 2px; background: repeating-linear-gradient(to right, var(--border-strong) 0 3px, transparent 3px 7px); }
+    body.dragging{ cursor: row-resize; }
+  }
+
+  /* narrow screens: the toolbar wraps onto two rows (below about 690px), so centre both */
+  @media (max-width: 700px){
+    .trow{ justify-content: center; }
+    .spacer{ display: none; }
+  }
+
+  /* users who ask for less motion get none */
+  @media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; }
+  }
+
+  /* ------------------------------------------------------------ print --
+     The preview pages ARE the print pages: @page is set to the exact page
+     size with zero margin, every .page is one PDF page. */
+  @media print{
+    /* the app chrome prints light, whatever the UI theme is; the document
+       itself follows the chosen Doc style (--paper and --doc-* stay) */
+    :root, html[data-theme="dark"]{
+      color-scheme: light;
+      --accent: #4F46E5; --accent-hover: #4338CA; --accent-ring: rgba(79,70,229,.35);
+      --selection: rgba(79,70,229,.18);
+    }
+    html, body{ height: auto; overflow: visible; background: #fff; }
+    #app{ display: block; height: auto; }
+    #toolbar, #editorPane, #splitter, #statusbar{ display: none !important; }
+    #main, #previewPane{ display: block; }
+    #viewport{
+      overflow: visible; padding: 0; background: #fff;
+      background-image: none;
+    }
+    #sizer{ width: auto !important; height: auto !important; margin: 0 !important; }
+    #scaler{ position: static; transform: none !important; width: auto !important; height: auto !important; }
+    #pages{ display: block; }
+    .page{
+      box-shadow: none; border-radius: 0; margin: 0;
+      break-after: page; page-break-after: always;
+    }
+    .page:last-child{ break-after: auto; page-break-after: auto; }
+  }
