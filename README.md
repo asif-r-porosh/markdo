@@ -63,4 +63,4 @@ Third-party code in `vendor/` (marked, DOMPurify, docx and the libraries bundled
 `vendor/THIRD-PARTY-NOTICES.txt`, with the full licence texts next to the files. Fonts: `fonts/OFL-*.txt`
 (SIL Open Font License).
 
-> RnD: Sonnet 5.5 & GLM 5.2
+> RnD: Used Sonnet 5.5 & GLM 5.2
