@@ -3,7 +3,7 @@
 Offline Markdown editor with a live, paginated preview. Exports PDF and DOCX.
 Runs in the browser; documents stay on the device. No account, no upload.
 
-Live: https://markdo.pages.dev
+Live: https://markdo.uraal.online/
 
 ## Features
 
