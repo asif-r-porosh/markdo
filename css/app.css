@@ -588,6 +588,10 @@
     #sizer{ width: auto !important; height: auto !important; margin: 0 !important; }
     #scaler{ position: static; transform: none !important; width: auto !important; height: auto !important; }
     #pages{ display: block; }
+    /* the off-screen scroll-sync mirror holds every editor line; left in the flow it
+       can be taller than the pages and print blank trailing pages. Fixed boxes add
+       no pages, and it keeps its layout so a measure during printing stays valid. */
+    #editorMirror{ position: fixed !important; }
     .page{
       box-shadow: none; border-radius: 0; margin: 0;
       break-after: page; page-break-after: always;

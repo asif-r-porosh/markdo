@@ -37,6 +37,35 @@ test('PDF page count equals preview page count (sample and long mixed document)'
   assert.equal(await H.pdfPageCount(page), preview);
 });
 
+test('PDF has no blank trailing page when the editor text is taller than the preview',
+  { skip: process.env.BROWSER && process.env.BROWSER !== 'chromium' ? 'page.pdf exists only in Chromium' : false },
+  async function () {
+  /* The off-screen scroll-sync mirror holds every editor line, wrapped at the editor width.
+     When it is taller than the printed pages it must not add pages of its own. */
+  const page = await app();
+  let md = '<!--settings:{"size":"A4","margin":"Normal","fontSize":"10pt","lineHeight":"1.25"}-->\n\n';
+  for (let i = 0; i < 40; i++) { md += 'Paragraph ' + i + '. ' + H.LOREM.repeat(2) + '\n\n'; }
+  await page.setInputFiles('#fileInput', { name: 'tall-editor.md', mimeType: 'text/markdown', buffer: Buffer.from(md) });
+  await page.waitForFunction(function () { return window.__fontsRerendered === true && document.querySelectorAll('#pages .page').length > 0; });
+  await page.evaluate(function () { return document.fonts.ready; });
+  await page.waitForTimeout(500);
+  const probe = await page.evaluate(function () {
+    const m = document.querySelector('body > div[aria-hidden="true"][style*="-9999px"]');
+    const pages = document.querySelectorAll('#pages .page');
+    return { mirrorH: m ? m.getBoundingClientRect().height : 0, pagesH: pages.length * pages[0].offsetHeight, n: pages.length };
+  });
+  assert.ok(probe.mirrorH > probe.pagesH, 'scenario: the mirror (' + probe.mirrorH + 'px) must be taller than the pages (' + probe.pagesH + 'px)');
+  assert.equal(await H.pdfPageCount(page), probe.n);
+  /* the mirror must keep its layout in print media, or a measure during printing would break scroll sync */
+  await page.emulateMedia({ media: 'print' });
+  const laidOut = await page.evaluate(function () {
+    const m = document.querySelector('body > div[aria-hidden="true"][style*="-9999px"]');
+    return m.getClientRects().length > 0 && m.children[0].offsetHeight > 0;
+  });
+  await page.emulateMedia({ media: 'screen' });
+  assert.equal(laidOut, true);
+});
+
 test('a pagebreak marker starts a new page', async function () {
   const page = await app();
   await H.setDoc(page, 'first\n\n<!--pagebreak-->\n\nsecond\n');

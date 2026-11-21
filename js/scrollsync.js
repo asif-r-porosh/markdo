@@ -130,6 +130,7 @@ export function measureEditorLines() {
   if (!v.length) { lineTops = [0]; return; }
   if (!mirror) {
     mirror = document.createElement('div');
+    mirror.id = 'editorMirror';
     mirror.setAttribute('aria-hidden', 'true');
     mirror.style.position = 'absolute';
     mirror.style.left = '-9999px';
