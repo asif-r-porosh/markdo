@@ -20,4 +20,6 @@ The app is `src-tauri/target/release/bundle/macos/MarkDo.app`. Run it with
 `open src-tauri/target/release/bundle/macos/MarkDo.app`. The build is unsigned, so it runs on the
 Mac that built it; handing it to another Mac needs signing and notarising.
 
+To build and install into `/Applications` in one step: `sh scripts/deploy-desktop.sh` from the repo root.
+
 Export to PDF opens the macOS print dialog, as in a browser; choose Save as PDF there.

@@ -46,10 +46,15 @@ Playwright (headless Chromium) with Node's built-in test runner. Details in `tes
 Direct upload, from the repo root:
 
     1. Raise CACHE in sw.js (for example mdpdf-v23 to mdpdf-v24)
-    2. sh scripts/stage.sh
-    3. npx wrangler login                                    # first time only
-    4. npx wrangler pages deploy dist --project-name markdo
-    5. rm -rf dist
+    2. npx wrangler login                                    # first time only
+    3. sh scripts/deploy-web.sh                              # stages, uploads, removes dist/
+
+`scripts/deploy-web.sh` runs `scripts/stage.sh`, then `npx wrangler pages deploy dist --project-name markdo`,
+and removes `dist/` afterwards, also when the upload fails. It warns about uncommitted changes and
+commits not yet pushed.
+
+The macOS app: `sh scripts/deploy-desktop.sh` builds it (see `desktop/README.md`) and installs it into
+`/Applications`, replacing the old copy. A running MarkDo is asked to quit first.
 
 Git-connected project instead: build command `sh scripts/stage.sh`, output directory `dist`.
 
