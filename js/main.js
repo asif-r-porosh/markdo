@@ -2,6 +2,7 @@
 /* Modules run once, in this order = the source order of the original
    single script, so listeners on shared targets register in the same
    order as before. Keep the list explicit. */
+import './native.js';
 import './dom.js';
 import './fonts.js';
 import './constants.js';
@@ -61,7 +62,7 @@ if (document.fonts && document.fonts.ready) {
 
 /* PWA: register the offline service worker when served over http(s).
    Skipped on file:// where service workers do not run. */
-if ('serviceWorker' in navigator &&
+if ('serviceWorker' in navigator && !window.__TAURI__ &&
     (location.protocol === 'https:' ||
      location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
   navigator.serviceWorker.register('sw.js').catch(function () { /* optional */ });

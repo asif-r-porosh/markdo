@@ -17,3 +17,9 @@ __MACOSX/
 # staged hosting output (scripts/stage.sh)
 dist/
 .wrangler/
+
+# desktop app build output (desktop/src-tauri)
+desktop/src-tauri/target/
+desktop/src-tauri/gen/
+# the Finder rule "Icon?" also matches the case-insensitive folder name "icons"
+!desktop/src-tauri/icons/

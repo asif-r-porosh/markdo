@@ -4,7 +4,7 @@
    on every release of the shell files. Updates apply immediately:
    install calls skipWaiting() and activate claims clients, and the page
    reloads itself once when the controller changes. */
-var CACHE = 'mdpdf-v30';
+var CACHE = 'mdpdf-v31';
 /* fonts live in their own cache, filled by the page (js/fontpack.js), so a
    release of the shell never throws the downloaded fonts away */
 var FONT_CACHE = 'mdpdf-fonts-v1';
@@ -46,6 +46,7 @@ var SHELL = [
   './js/main.js',
   './js/markers.js',
   './js/menubar.js',
+  './js/native.js',
   './js/paginate.js',
   './js/render.js',
   './js/sanitize.js',
