@@ -4,7 +4,7 @@
    on every release of the shell files. Updates apply immediately:
    install calls skipWaiting() and activate claims clients, and the page
    reloads itself once when the controller changes. */
-var CACHE = 'mdpdf-v27';
+var CACHE = 'mdpdf-v30';
 /* fonts live in their own cache, filled by the page (js/fontpack.js), so a
    release of the shell never throws the downloaded fonts away */
 var FONT_CACHE = 'mdpdf-fonts-v1';
@@ -19,6 +19,7 @@ var SHELL = [
   './favicon.ico',
   './favicon-32x32.png',
   './favicon-16x16.png',
+  './favicon-96x96.png',
   /* stylesheets, vendored libraries and ES modules of the app shell.
      docx UMD bundle for Export DOCX (MIT, see vendor/docx.LICENSE.txt):
      lazy-loaded by the app on first export, precached so it works offline */

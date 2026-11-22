@@ -7,7 +7,7 @@ set -eu
 cd "$(dirname "$0")/.."
 rm -rf dist
 mkdir dist
-cp LICENSE index.html sw.js manifest.json icon-192.png icon-512.png icon-maskable-512.png apple-touch-icon.png favicon.ico favicon-32x32.png favicon-16x16.png dist/
+cp LICENSE index.html sw.js manifest.json icon-192.png icon-512.png icon-maskable-512.png apple-touch-icon.png favicon.ico favicon-32x32.png favicon-16x16.png favicon-96x96.png dist/
 cp -R css js vendor fonts dist/
 cp deploy/_headers dist/_headers
 find dist \( -name '.DS_Store' -o -name '._*' \) -delete

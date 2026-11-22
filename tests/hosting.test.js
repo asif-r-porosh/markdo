@@ -27,7 +27,7 @@ test('h1. dist holds the whole app shell and nothing else', function () {
   shell.forEach(function (f) { assert.ok(files.indexOf(f) >= 0, 'sw.js lists ' + f + ' but dist lacks it'); });
   assert.ok(files.indexOf('sw.js') >= 0 && files.indexOf('_headers') >= 0);
   const tops = Array.from(new Set(files.map(function (f) { return f.split('/')[0]; }))).sort();
-  assert.deepEqual(tops, ['LICENSE', '_headers', 'apple-touch-icon.png', 'css', 'favicon-16x16.png', 'favicon-32x32.png', 'favicon.ico', 'fonts', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'index.html', 'js', 'manifest.json', 'sw.js', 'vendor']);
+  assert.deepEqual(tops, ['LICENSE', '_headers', 'apple-touch-icon.png', 'css', 'favicon-16x16.png', 'favicon-32x32.png', 'favicon-96x96.png', 'favicon.ico', 'fonts', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'index.html', 'js', 'manifest.json', 'sw.js', 'vendor']);
   const litter = files.filter(function (f) { return /\.md$|\.DS_Store$|(^|\/)\._|node_modules|tests\//.test(f); });
   assert.deepEqual(litter, [], 'must not publish notes or litter');
 });
