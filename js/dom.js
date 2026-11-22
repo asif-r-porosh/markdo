@@ -22,7 +22,6 @@ export var pgNumOnCb = $('#pgNumOn');
 export var pgNumStartInp = $('#pgNumStart');
 export var footerTextInp = $('#footerText');
 export var fileInput = $('#fileInput');
-export var splitBtn = $('#splitBtn');
 export var statLeft = $('#statLeft');
 export var splitter = $('#splitter');
 export var mainEl = $('#main');

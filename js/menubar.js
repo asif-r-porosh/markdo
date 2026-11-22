@@ -4,10 +4,11 @@ import { closeDocument, newDocument, openDocument, saveMarkdown } from './docume
 import { openHfDialog } from './hfdialog.js';
 import { editorRedo, editorUndo } from './markers.js';
 import { exportDocx, printWhenFontsReady } from './export.js';
+import { cycleLayout, LAYOUT_NAMES, LAYOUTS, setLayout, splitDir } from './layout.js';
 import { ddClose, ddLabel, ddOpenIdx } from './dropdowns.js';
 
 /* ------------------------------------------- menubar panels ---------- */
-/* The File / Edit / Format / Page Setup / Export menus. File, Edit and Export
+/* The File / Edit / View / Format / Page Setup / Export menus. File, Edit, View and Export
    are plain action lists; Format and Page Setup are cascading pickers whose submenus
    are built from the hidden state-holder <select>s -- the same option data
    the old dropdowns used, so settings files, shortcuts and tests keep
@@ -25,6 +26,13 @@ var MB_MENUS = [
     { lab: 'Undo', fn: editorUndo, hint: 'Ctrl/Cmd+Z' },
     { lab: 'Redo', fn: editorRedo, hint: 'Ctrl+Y \u00b7 Cmd+Shift+Z' }
   ] },
+  { btn: 'mbViewBtn', menu: 'mbViewMenu', actions: LAYOUTS.map(function (k) {
+      return { lab: LAYOUT_NAMES[k], fn: function () { setLayout(k); }, radio: k, id: 'layout-' + k };
+    }).concat([
+      { sep: true },
+      { lab: 'Next layout', fn: function () { cycleLayout(1); }, hint: 'Ctrl/Cmd+]', pad: true },
+      { lab: 'Previous layout', fn: function () { cycleLayout(-1); }, hint: 'Ctrl/Cmd+[', pad: true }
+  ]) },
   { btn: 'mbFormatBtn', menu: 'mbFormatMenu', pickers: [
     { sel: 'docStyle',   label: 'Style' },
     { sel: 'headFont',   label: 'Header font' },
@@ -186,6 +194,14 @@ function mbAppendAction(menu, a) {
   b.setAttribute('role', 'menuitem');
   if (a.id) { b.id = a.id; }          /* stable ids for tests + docxBtn state */
   if (a.tip) { b.title = a.tip; }     /* hover text */
+  if (a.radio !== undefined || a.pad) {
+    /* a check column: ticked for the current choice, an empty slot keeps the labels aligned */
+    b.innerHTML = MB_CHECK;
+    if (a.radio !== undefined) {
+      b.setAttribute('role', 'menuitemradio');
+      b.setAttribute('aria-checked', String(splitDir === a.radio));
+    }
+  }
   var face = document.createElement('span');
   face.className = 'dd-face';
   face.textContent = a.lab;

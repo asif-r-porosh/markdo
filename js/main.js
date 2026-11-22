@@ -33,6 +33,7 @@ import './sanitize.js';
 import { render, scheduleRender } from './render.js';
 import { initSync } from './scrollsync.js';
 import { initTheme } from './theme.js';
+import { initLayout } from './layout.js';
 import { isDocDirty, loadState } from './document.js';
 import { buildDropdowns } from './dropdowns.js';
 import { initMenubar } from './menubar.js';
@@ -43,6 +44,7 @@ loadState();
 buildDropdowns();    /* wrap the zoom select (after loadState) */
 initMenubar();       /* wire the File / Format / Layout menubar */
 initSync();          /* after loadState: LS_SYNC wins over the reset */
+initLayout();        /* same for the saved pane layout */
 initTheme();
 render();
 

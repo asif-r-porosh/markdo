@@ -7,6 +7,7 @@ import { cycleTheme } from './theme.js';
 import { openDocument, saveMarkdown } from './document.js';
 import { printWhenFontsReady } from './export.js';
 import { insertLinebreak, insertPagebreak } from './markers.js';
+import { cycleLayout } from './layout.js';
 
 /* linked scrolling: toggle + the two scroll surfaces */
 var syncBtnEl = $('#syncBtn');
@@ -34,6 +35,15 @@ document.addEventListener('keydown', function (e) {
   if ((e.ctrlKey || e.metaKey) && (e.key === 'o' || e.key === 'O')) {
     e.preventDefault();
     openDocument();
+    return;
+  }
+  /* Ctrl/Cmd+] = next layout, Ctrl/Cmd+[ = previous (vertical, horizontal, editor only,
+     preview only). The physical bracket keys, so layouts that need AltGr for [ ] work too;
+     no Shift or Alt, because Cmd+Shift+[ is tab switching in browsers. */
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && !e.isComposing &&
+      (e.code === 'BracketRight' || e.code === 'BracketLeft')) {
+    e.preventDefault();
+    if (!document.querySelector('.modal:not([hidden])')) { cycleLayout(e.code === 'BracketRight' ? 1 : -1); }
     return;
   }
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'L' || e.key === 'l')) {

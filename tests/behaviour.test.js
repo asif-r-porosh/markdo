@@ -66,6 +66,28 @@ test('PDF has no blank trailing page when the editor text is taller than the pre
   assert.equal(laidOut, true);
 });
 
+test('print: a page box fits a whole-pixel sheet and keeps its text area', async function () {
+  /* WebKit (Tauri on macOS) uses whole pixels for the sheet: a box of exactly 297mm
+     (1122.52px) spills onto a second sheet and prints a blank page after every page. */
+  const page = await app();
+  await H.setDoc(page, '# One\n\nbody\n\n<!--pagebreak-->\n\n# Two\n\nbody\n');
+  await page.waitForFunction(function () { return document.querySelectorAll('#pages .page').length > 1; });
+  const measure = function () {
+    return page.evaluate(function () {
+      const p = document.querySelector('#pages .page');
+      /* computed heights are layout pixels; getBoundingClientRect would include the fit-zoom scale */
+      return { page: parseFloat(getComputedStyle(p).height), text: parseFloat(getComputedStyle(p.querySelector('.page-content')).height) };
+    });
+  };
+  const screenM = await measure();
+  await page.emulateMedia({ media: 'print' });
+  const printM = await measure();
+  await page.emulateMedia({ media: 'screen' });
+  assert.ok(printM.page <= Math.floor(screenM.page), 'print page ' + printM.page + 'px must fit the whole-pixel sheet ' + Math.floor(screenM.page) + 'px');
+  assert.ok(printM.page > screenM.page - 1.6, 'print page must stay within about a pixel of the sheet');
+  assert.ok(Math.abs(printM.text - screenM.text) < 0.1, 'text area must keep its size: ' + printM.text + ' vs ' + screenM.text);
+});
+
 test('a pagebreak marker starts a new page', async function () {
   const page = await app();
   await H.setDoc(page, 'first\n\n<!--pagebreak-->\n\nsecond\n');

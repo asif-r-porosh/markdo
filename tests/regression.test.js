@@ -122,7 +122,7 @@ test('2d. one Undo takes a Tab edit back, selection or not', async function () {
   const page = await app();
   await typeIn(page, 'line one\nline two', 0, 17);
   await page.keyboard.press('Tab');
-  await page.keyboard.press('Control+z');
+  await page.keyboard.press(H.UNDO);
   assert.equal(await page.inputValue('#editor'), 'line one\nline two');
 });
 
@@ -345,7 +345,8 @@ test('8c. the window title (PDF name) and the DOCX name use the same plain title
 /* ---- backlog 010: view preferences belong to the reader, not to the file ---- */
 async function setView(page) {
   await page.click('#themeBtn');                       /* light -> dark */
-  await page.click('#splitBtn');                       /* side by side -> stacked */
+  await page.click('#mbViewBtn');                      /* View > Horizontal split: side by side -> stacked */
+  await page.click('#layout-h');
   await page.click('#syncBtn');                        /* linked scrolling off */
   await page.evaluate(function () { const z = document.querySelector('#zoom'); z.value = '1.25'; z.dispatchEvent(new Event('change', { bubbles: true })); });
 }

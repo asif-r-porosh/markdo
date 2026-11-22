@@ -47,7 +47,7 @@ export function applyCfgToControls(cfg, docOnly) {
      to their legacy pgNumOn / pgNumStart / footer keys */
   setHfCfg((cfg.hf && typeof cfg.hf === 'object') ? normalizeHf(cfg.hf) : legacyHf(cfg));
   syncHfMirrors();
-  if (!docOnly && (cfg.split === 'v' || cfg.split === 'h')) { setSplit(cfg.split); }
+  if (!docOnly && (cfg.split === 'v' || cfg.split === 'h' || cfg.split === 'e' || cfg.split === 'p')) { setSplit(cfg.split); }
   if (!docOnly && (cfg.theme === 'light' || cfg.theme === 'dark' || cfg.theme === 'system')) { setThemeChoice(cfg.theme); }
   if (cfg.docstyle !== undefined && cfg.docstyle !== null) { setDocStyle(String(cfg.docstyle)); }
   if (!docOnly && (cfg.scrollsync === true || cfg.scrollsync === false)) { setSync(cfg.scrollsync); }
@@ -68,7 +68,7 @@ export function resetControlsToDefaults(persist, docOnly) {
   if (!docOnly) { setSync(true, persist); }
   setHfCfg(defaultHfCfg());
   syncHfMirrors();
-  if (!docOnly) { setSplit('v'); }
+  if (!docOnly) { setSplit('v', persist); }
   ddSyncAll();
 }
 

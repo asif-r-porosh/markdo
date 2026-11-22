@@ -134,14 +134,6 @@
   #syncBtn svg{ width: 16px; height: 16px; display: block; }
   #syncBtn[aria-pressed="true"]{ color: var(--accent); background: var(--accent-soft); }
   #syncBtn[aria-pressed="true"]:hover{ color: var(--accent); }
-  /* split direction toggle (statusbar): columns icon = side-by-side,
-     rows icon = stacked; the icon reflects the CURRENT direction */
-  #splitBtn{ display: inline-flex; align-items: center; justify-content: center; padding: 3px 8px; color: var(--text-3); }
-  #splitBtn:hover{ color: var(--text-1); }
-  #splitBtn svg{ width: 15px; height: 15px; display: block; }
-  #splitBtn .icon-rows{ display: none; }
-  body[data-split="h"] #splitBtn .icon-cols{ display: none; }
-  body[data-split="h"] #splitBtn .icon-rows{ display: block; }
   /* free-text footer input (row 2) */
   .txtin{
     font: inherit; font-size: var(--fs-xs); color: var(--text-1); background: var(--bg-inset);
@@ -178,7 +170,7 @@
   /* --------------------------------------- toolbar menubar ------------- */
   /* Row 1 hosts three cascading menus (File, Format, Layout) plus Save;
      row 2 holds the page furniture. Rows wrap on very narrow windows. */
-  .menubar{ display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+  .menubar{ display: flex; align-items: center; gap: 6px; flex: 0 0 auto; flex-wrap: wrap; justify-content: center; max-width: 100%; }
   .dd-btn.menubtn{
     background: transparent; border-color: transparent; font-weight: 500; padding: 5px 10px;
   }
@@ -236,7 +228,7 @@
   .dd-opt:hover, .dd-opt.focus{ background: var(--bg-subtle); }
   .dd-opt[aria-selected="true"]{ color: var(--accent); font-weight: 600; }
   .dd-opt .dd-check{ width: 13px; height: 13px; flex: 0 0 auto; visibility: hidden; color: var(--accent); }
-  .dd-opt[aria-selected="true"] .dd-check{ visibility: visible; }
+  .dd-opt[aria-selected="true"] .dd-check, .dd-opt[aria-checked="true"] .dd-check{ visibility: visible; }
   .dd-opt .dd-face{ flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .dd-opt .dd-sw{                                     /* doc-style color swatch */
     width: 14px; height: 14px; border-radius: 50%; flex: 0 0 auto;
@@ -293,7 +285,7 @@
   /* keyboard focus: one consistent ring on every control */
   .tbtn:focus-visible, .hf-pos select:focus-visible, .numin:focus-visible, .txtin:focus-visible,
   #themeBtn:focus-visible, #syncBtn:focus-visible,
-  #splitBtn:focus-visible, .dd-btn:focus-visible, .mbtn:focus-visible,
+  .dd-btn:focus-visible, .mbtn:focus-visible,
   .hf-row input[type="checkbox"]:focus-visible{
     outline: 2px solid var(--accent-ring); outline-offset: 2px;
   }
@@ -340,6 +332,17 @@
     background: repeating-linear-gradient(to right, var(--border-strong) 0 3px, transparent 3px 7px);
   }
   body[data-split="h"].dragging{ cursor: row-resize; }
+
+  /* View menu: e = editor only, p = preview only. The hidden pane is taken out of the flow
+     but keeps its layout (visibility, not display): pagination and linked scrolling
+     measure it. The visible pane takes the whole row, whatever the splitter set. */
+  #main{ position: relative; }
+  body[data-split="e"] #previewPane, body[data-split="p"] #editorPane{
+    position: absolute; top: 0; left: 0; width: 50%; height: 100%;
+    visibility: hidden; pointer-events: none;
+  }
+  body[data-split="e"] #splitter, body[data-split="p"] #splitter{ display: none; }
+  body[data-split="e"] #editorPane, body[data-split="p"] #previewPane{ flex: 1 1 100% !important; }
 
   #editor, #editorHl{
     padding: 16px 18px; font-family: var(--editor-font); font-size: 13.5px; line-height: 1.6;
@@ -581,6 +584,8 @@
     #app{ display: block; height: auto; }
     #toolbar, #editorPane, #splitter, #statusbar{ display: none !important; }
     #main, #previewPane{ display: block; }
+    /* every layout prints the preview, even when the View menu hides it on screen */
+    #previewPane{ position: static !important; visibility: visible !important; width: auto !important; height: auto !important; pointer-events: auto !important; }
     #viewport{
       overflow: visible; padding: 0; background: #fff;
       background-image: none;
@@ -595,6 +600,12 @@
     .page{
       box-shadow: none; border-radius: 0; margin: 0;
       break-after: page; page-break-after: always;
+      /* WebKit lays the sheet out in whole pixels (297mm is 1122.52px, it uses 1122),
+         so a box of exactly 297mm overflows the sheet and prints a blank page after
+         every page. One pixel shorter fits; the bottom padding gives that pixel back
+         so the text area keeps its size. */
+      height: calc(var(--ph) - 1px);
+      padding-bottom: max(0px, calc(var(--pm) - 1px));
     }
     .page:last-child{ break-after: auto; page-break-after: auto; }
   }

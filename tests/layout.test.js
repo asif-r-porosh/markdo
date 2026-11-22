@@ -12,8 +12,8 @@ const geometry = function (page) {
   return page.evaluate(function () {
     const g = document.querySelector('.tb-group').getBoundingClientRect();
     const b = document.querySelector('.brand').getBoundingClientRect();
-    const menus = document.querySelector('#mbExportBtn').getBoundingClientRect();
-    return { gl: g.left, gr: g.right, gtop: g.top, btop: b.top, bl: b.left, mr: menus.right, vw: document.documentElement.clientWidth };
+    const bar = document.querySelector('.menubar').getBoundingClientRect();
+    return { gl: g.left, gr: g.right, gtop: g.top, btop: b.top, bl: b.left, br: b.right, mr: bar.right, ml: bar.left, mtop: bar.top, vw: document.documentElement.clientWidth };
   });
 };
 
@@ -34,9 +34,13 @@ test('l2. narrow window: the wrapped toolbar rows are centred', async function (
     const g = await geometry(page);
     assert.ok(g.gtop - g.btop > 10, w + ': the group wraps to a second row');
     assert.ok(Math.abs((g.gl + g.gr) / 2 - g.vw / 2) < 3, w + ': Save group centred, centre ' + (g.gl + g.gr) / 2 + ' of ' + g.vw / 2);
-    if (w >= 500) {            /* brand and menus still share one row here; on a phone they stack */
+    assert.ok(g.mr <= g.vw, w + ': the menus stay inside the window, right edge ' + g.mr + ' of ' + g.vw);
+    if (Math.abs(g.mtop - g.btop) < 12) {      /* brand and menus share one row */
       const rowCentre = (g.bl + g.mr) / 2;
       assert.ok(Math.abs(rowCentre - g.vw / 2) < 3, w + ': menu row centred, centre ' + rowCentre);
+    } else {                                    /* on a narrow window they stack, each row centred */
+      assert.ok(Math.abs((g.ml + g.mr) / 2 - g.vw / 2) < 3, w + ': stacked menu row centred, centre ' + (g.ml + g.mr) / 2);
+      assert.ok(Math.abs((g.bl + g.br + 6) / 2 - g.vw / 2) < 3, w + ': stacked brand centred (6px right margin), centre ' + (g.bl + g.br + 6) / 2);
     }
   }
 });

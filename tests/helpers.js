@@ -112,7 +112,15 @@ async function pressAndDownload(page, action) {
 
 const LOREM = 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ';
 
+/* Native editing keys differ by platform: Chromium on macOS undoes on Cmd+Z and redoes on
+   Cmd+Shift+Z (Ctrl+Y is not a redo there); on Windows and Linux Ctrl+Z, Ctrl+Y and
+   Ctrl+Shift+Z all work. REDO_ALT is the second redo spelling, or null where there is none. */
+const MAC = process.platform === 'darwin';
+const UNDO = MAC ? 'Meta+z' : 'Control+z';
+const REDO = MAC ? 'Meta+Shift+z' : 'Control+y';
+const REDO_ALT = MAC ? null : 'Control+Shift+z';
+
 module.exports = {
   setup, openApp, waitBooted, setDoc, pagesInfo, previewPageCount, pdfPageCount,
-  pressAndDownload, LOREM
+  pressAndDownload, LOREM, UNDO, REDO, REDO_ALT
 };

@@ -18,12 +18,12 @@ const menuItem = function (page, label) {
   return page.locator('#mbEditMenu .dd-opt', { hasText: label });
 };
 
-test('e1. Edit menu sits between File and Format and lists Undo and Redo with their keys', async function () {
+test('e1. Edit menu sits after File, View follows it, and Edit lists Undo and Redo with their keys', async function () {
   const { page } = await H.openApp(env);
   const names = await page.evaluate(function () {
     return Array.from(document.querySelectorAll('.menubar .menubtn')).map(function (b) { return b.textContent.trim(); });
   });
-  assert.deepEqual(names, ['File', 'Edit', 'Format', 'Page Setup', 'Export']);
+  assert.deepEqual(names, ['File', 'Edit', 'View', 'Format', 'Page Setup', 'Export']);
   await page.click('#mbEditBtn');
   const rows = await page.evaluate(function () {
     return Array.from(document.querySelectorAll('#mbEditMenu .dd-opt')).map(function (b) { return b.textContent.replace(/\s+/g, ' ').trim(); });
@@ -55,18 +55,20 @@ test('e2. Undo and Redo from the menu act on the editor and give focus back', as
   assert.equal(await page.evaluate(function () { return document.querySelector('#editorHl').textContent.replace(/ $/, ''); }), typed, 'colour layer follows');
 });
 
-test('e3. Ctrl+Z, Ctrl+Y and Ctrl+Shift+Z still work natively', async function () {
+test('e3. Undo and both Redo spellings still work natively', async function () {
   const { page } = await H.openApp(env);
   await H.setDoc(page, 'a');
   await type(page, 'bcd');
   const full = await value(page);
-  await page.keyboard.press('Control+z');
+  await page.keyboard.press(H.UNDO);
   assert.notEqual(await value(page), full);
-  await page.keyboard.press('Control+y');
+  await page.keyboard.press(H.REDO);
   assert.equal(await value(page), full);
-  await page.keyboard.press('Control+z');
-  await page.keyboard.press('Control+Shift+z');
-  assert.equal(await value(page), full);
+  if (H.REDO_ALT) {
+    await page.keyboard.press(H.UNDO);
+    await page.keyboard.press(H.REDO_ALT);
+    assert.equal(await value(page), full);
+  }
 });
 
 test('e4. Undo also reverses an inserted page break marker', async function () {

@@ -9,7 +9,7 @@ Live: https://markdo.uraal.online/
 
 - Editor with light Markdown colouring (headings, code, links, lists, tables, page-break markers), bundled Geist Mono
 - GitHub-flavoured Markdown: tables, task lists, fenced code, strikethrough
-- Preview split into real pages: A4, Letter, Legal, A5, A3; Narrow / Normal / Wide margins; zoom; side-by-side or stacked
+- Preview split into real pages: A4, Letter, Legal, A5, A3; Narrow / Normal / Wide margins; zoom; View menu: side-by-side, stacked, editor only or preview only (Ctrl/Cmd+] and [ cycle them, remembered across visits)
 - Linked scrolling between editor and preview
 - Page break and line break markers: `Ctrl/Cmd+Enter`, `Ctrl/Cmd+Shift+Enter`
 - Running header and footer, page numbers with a start offset
